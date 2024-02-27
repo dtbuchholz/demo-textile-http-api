@@ -1,6 +1,6 @@
-# Basin Go API Example
+# Textile HTTP API + Go Example
 
-This is a simple example of how to use the Basin Go API. It shows you how to create a new project, create a new task, and create a new comment on that task.
+> Example of how to use the Textile HTTP API in Go, including signing files before writing them to a vault
 
 ## Usage
 
@@ -19,7 +19,13 @@ Create response: {"created":true}
 Writing to vault 'test_signer_impl.data'
 Write response: []
 Getting vault 'test_signer_impl.data' events
-Events: [{"cid":"bafkreifsdtxsbxdws22plke4origeoervejrke2ocalhbcec2omodwj2ju","timestamp":1709021225,"cache_expiry":"2024-03-05T20:07:07.932928"}]
+Events:
+  CID: bafkreifsdtxsbxdws22plke4origeoervejrke2ocalhbcec2omodwj2ju
+  Timestamp: 1709021225
+  IsArchived: false
+  CacheExpiry: 2024-03-05T20:07:07.932928
+Downloading event 'bafkreifsdtxsbxdws22plke4origeoervejrke2ocalhbcec2omodwj2ju'
+Event downloaded successfully
 ```
 
 ### Signing pkg

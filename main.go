@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,7 +20,14 @@ import (
 	"github.com/tablelandnetwork/basin-cli/pkg/signing"
 )
 
-// Create a vault via the Basin API
+type Event struct {
+	CID         string `json:"cid"`
+	Timestamp   int64  `json:"timestamp"`
+	IsArchived  bool   `json:"is_archived"`
+	CacheExpiry string `json:"cache_expiry"`
+}
+
+// createVault creates a vault via the Basin API.
 func createVault(vaultID, account string, cache *int) error {
 	data := url.Values{}
 	data.Set("account", account)
@@ -44,7 +52,7 @@ func createVault(vaultID, account string, cache *int) error {
 	return nil
 }
 
-// Write a file to a vault via the Basin API
+// writeEvent writes a file to a vault via the Basin API.
 func writeEvent(vaultId, filename, timestamp, signature string) error {
 	url := fmt.Sprintf("https://basin.tableland.xyz/vaults/%s/events?timestamp=%s&signature=%s", vaultId, timestamp, signature)
 
@@ -85,25 +93,59 @@ func writeEvent(vaultId, filename, timestamp, signature string) error {
 	return nil
 }
 
-// List the events in a vault via the Basin API
-func listEvents(vaultId string) (string, error) {
+// listEvents lists the events in a vault via the Basin API.
+func listEvents(vaultId string) ([]Event, error) {
 	url := fmt.Sprintf("https://basin.tableland.xyz/vaults/%s/events", vaultId)
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("failed to list events: %s, response: %s", resp.Status, string(bodyBytes))
 	}
 
-	return string(body), nil
+	var events []Event
+	if err := json.NewDecoder(resp.Body).Decode(&events); err != nil {
+		return nil, err
+	}
+
+	return events, nil
 }
 
-// Get the public key from a private key
+// downloadEvent downloads an event from the cache and saves it to a file.
+func downloadEvent(eventID, outputPath string) error {
+	url := fmt.Sprintf("https://basin.tableland.xyz/events/%s", eventID)
+
+	outFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("error creating file: %v", err)
+	}
+	defer outFile.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("error making GET request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("received non-200 response status: %d %s", resp.StatusCode, resp.Status)
+	}
+
+	_, err = io.Copy(outFile, resp.Body)
+	if err != nil {
+		return fmt.Errorf("error writing to file: %v", err)
+	}
+
+	fmt.Println("Event downloaded successfully")
+	return nil
+}
+
+// getPubKey returns the public key from a private key
 func getPubKey(privateKey *ecdsa.PrivateKey) (string, error) {
 	pubKey := privateKey.Public()
 	pubKeyECDSA, ok := pubKey.(*ecdsa.PublicKey)
@@ -143,7 +185,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error signing file: %v", err)
 	}
-	fmt.Printf("Signature: %v", signature)
+	fmt.Printf("Signature: %v\n", signature)
 
 	// Create a test vault via API
 	fmt.Printf("Creating vault '%s' for account: %s\n", vaultId, account)
@@ -171,5 +213,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error listing events: %v", err)
 	}
-	fmt.Printf("Events: %v", events)
+	// Log or process the events
+	fmt.Print("Events:\n")
+	for _, event := range events {
+		fmt.Printf("  CID: %s\n  Timestamp: %d\n  IsArchived: %t\n  CacheExpiry: %s\n", event.CID, event.Timestamp, event.IsArchived, event.CacheExpiry)
+	}
+
+	// Download the first event from the cache to a file
+	cid := events[0].CID
+	fmt.Printf("Downloading event '%s'\n", events[0].CID)
+	outputPath := "test-download.txt"
+	if err := downloadEvent(cid, outputPath); err != nil {
+		fmt.Printf("Error downloading event: %v\n", err)
+	}
 }
