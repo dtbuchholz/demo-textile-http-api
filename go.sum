@@ -20,6 +20,8 @@ github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcU
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/tablelandnetwork/basin-cli v0.0.11-0.20240227064434-041f68f8efa8 h1:tenYDNe1v5K2tiIqT9W7Q3aOddVzZGlFxZyynFtcghc=
 github.com/tablelandnetwork/basin-cli v0.0.11-0.20240227064434-041f68f8efa8/go.mod h1:MFKI9q5IcgEhCmWHX60nJQCsLpy1PZ5LLTXdno93bmU=
+github.com/tablelandnetwork/basin-cli v0.0.11 h1:lsZcwwrsHKPzSU3Fq6EbqxbetXOlf5p8xoMX/hXa2Ik=
+github.com/tablelandnetwork/basin-cli v0.0.11/go.mod h1:MFKI9q5IcgEhCmWHX60nJQCsLpy1PZ5LLTXdno93bmU=
 golang.org/x/crypto v0.14.0 h1:wBqGXzWJW6m1XrIKlAH0Hs1JJ7+9KBwnIO8v66Q9cHc=
 golang.org/x/crypto v0.14.0/go.mod h1:MVFd36DqK4CsrnJYDkBA3VC4m2GkXAM0PvzMCn4JQf4=
 golang.org/x/sys v0.13.0 h1:Af8nKPmuFypiUBjVoU9V20FiaFXOcuZI21p0ycVYYGE=

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -167,7 +168,7 @@ func main() {
 	vaultId := os.Getenv("VAULT_ID")
 
 	// Set up our private key, account/address, and signer
-	privateKey, _ := signing.LoadPrivateKey(pk)
+	privateKey, _ := signing.HexToECDSA(pk)
 	account, _ := getPubKey(privateKey)
 	signer := signing.NewSigner(privateKey)
 
@@ -181,10 +182,11 @@ func main() {
 	defer file.Close()
 
 	// Sign the file
-	signature, err := signer.SignFile(filename)
+	signatureBytes, err := signer.SignFile(filename)
 	if err != nil {
 		log.Fatalf("Error signing file: %v", err)
 	}
+	signature := hex.EncodeToString(signatureBytes)
 	fmt.Printf("Signature: %v\n", signature)
 
 	// Create a test vault via API

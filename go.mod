@@ -4,7 +4,7 @@ go 1.21.3
 
 require (
 	github.com/joho/godotenv v1.5.1
-	github.com/tablelandnetwork/basin-cli v0.0.11-0.20240227064434-041f68f8efa8
+	github.com/tablelandnetwork/basin-cli v0.0.11
 )
 
 require (
