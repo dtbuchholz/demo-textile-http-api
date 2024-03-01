@@ -30,14 +30,16 @@ Event downloaded successfully
 
 ### Signing pkg
 
-This example uses the `signing` package to sign the data before writing it to the vault. It's currently on the [`dtb/signer-lib` branch](https://github.com/tablelandnetwork/basin-cli/blob/dtb/signer-lib/pkg/signing/signing.go) of the `basin-cli` repository. To use it, you can add the following to your `go.mod` file:
+This example uses the `signing` package to sign the data before writing it to the vault. It's currently in [`basin-cli v0.0.11`](https://github.com/tablelandnetwork/basin-cli/blob/main/pkg/signing/signing.go). To use it, you can install it with:
 
 ```sh
-github.com/tablelandnetwork/basin-cli v0.0.11-0.20240227064434-041f68f8efa8
+go get github.com/tablelandnetwork/basin-cli/pkg/signing@v0.0.11
 ```
 
 It offers a few methods:
 
-- `LoadPrivateKey`: Loads a private key from the given string and creates an ECDSA private key.
+- `HexToECDSA`: Loads a private key from the given string and creates an ECDSA private key.
+- `FileToECDSA`: Loads a private key from a file and creates an ECDSA private key.
 - `NewSigner`: Creates a new signer with the given private key, provided by `LoadPrivateKey`.
-- `SignFile`: Signs the given file with the signer and returns the signature as a string, which can be used in the URL POST request to write data to a vault.
+- `SignFile`: Signs the given file with the signer and returns the signature as a bytes slice, which can be converted to a string and used in the URL POST request to write data to a vault.
+- `SignBytes`: Signs arbitrary bytes and returns a signature as a bytes slice.
